@@ -16,6 +16,7 @@ fields.forEach(field=>fieldsState[field.id]='');
 export default function Login(){
     const [loginState,setLoginState]=useState(fieldsState);
     const [testDetailsOn,setTestDetailsOn]=useState(false);
+    const [loading,setLoading]=useState(false);
 
     const handleChange=(e)=>{   
         setLoginState({...loginState,[e.target.id]:e.target.value})
@@ -40,13 +41,20 @@ export default function Login(){
 
     const authenticateUser = async() =>{
         try {
+            setLoading(true);
             const response=await axios.post(`${process.env.REACT_APP_API_URL}/api/users/login`,loginState);
-
+                
             if(response.status == 200){
                 console.log('User Logged In');
                 toast.success('User Logged In');
                 localStorage.setItem('token',response.data.token)
+                setLoading(false)
                 navigate('/home')
+
+            }else{
+                console.log('Error Logging In');
+                toast.error('Error Logging In');
+                setLoading(false)
             }
 
 
@@ -94,7 +102,7 @@ export default function Login(){
         
 
         <FormExtra/>
-        <FormAction handleSubmit={handleSubmit} text="Login"/>
+        <FormAction handleSubmit={handleSubmit} text={loading ? 'Loading ...':'Login'}/>
 
       </form>
     )
